@@ -29,6 +29,16 @@ const NotePage = () => {
     });
   };
 
+  const deleteNote = async () => {
+    await fetch(`/api/notes/${noteId}/delete/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    navigate("/");
+  };
+
   const handleSave = () => {
     updateNote();
     navigate("/");
@@ -40,6 +50,7 @@ const NotePage = () => {
         <h3>
           <ArrowLeft onClick={handleSave} />
         </h3>
+        <button onClick={deleteNote}>Delete</button>
       </div>
       <textarea
         onChange={(e) => {
