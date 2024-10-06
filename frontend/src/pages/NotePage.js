@@ -9,6 +9,8 @@ const NotePage = () => {
 
   useEffect(() => {
     const getNote = async () => {
+      if (noteId === "new") return;
+
       const data = await fetch(`/api/notes/${noteId}`).then((res) =>
         res.json()
       );
@@ -19,8 +21,18 @@ const NotePage = () => {
     getNote();
   }, [noteId]);
 
+  const createNote = async () => {
+    await fetch(`/api/notes/create/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(note),
+    });
+  };
+
   const updateNote = async () => {
-    fetch(`/api/notes/${noteId}/update/`, {
+    await fetch(`/api/notes/${noteId}/update/`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -39,9 +51,20 @@ const NotePage = () => {
     navigate("/");
   };
 
-  const handleSave = () => {
-    updateNote();
+  const handleSave = async () => {
+    if (noteId !== "new" && note.body === "") {
+      await deleteNote();
+    } else if (noteId !== "new") {
+      await updateNote();
+    } else if (noteId === "new" && note) {
+      await createNote();
+    }
+
     navigate("/");
+  };
+
+  const handleChange = (e) => {
+    setNote((note) => ({ ...note, body: e.target.value }));
   };
 
   return (
@@ -50,14 +73,13 @@ const NotePage = () => {
         <h3>
           <ArrowLeft onClick={handleSave} />
         </h3>
-        <button onClick={deleteNote}>Delete</button>
+        {noteId !== "new" ? (
+          <button onClick={deleteNote}>Delete</button>
+        ) : (
+          <button onClick={handleSave}>Done</button>
+        )}
       </div>
-      <textarea
-        onChange={(e) => {
-          setNote({ ...note, body: e.target.value });
-        }}
-        defaultValue={note?.body}
-      ></textarea>
+      <textarea onChange={handleChange} value={note?.body}></textarea>
     </div>
   );
 };
