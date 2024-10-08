@@ -23,8 +23,8 @@ const ListItem = ({ note }) => {
       <div className="notes-list-item">
         <h3 className="title">{getTitle(note)}</h3>
         <p>
-          <span>{getTime(note)}</span>
           <span className="content">{getContent(note)}</span>
+          <span>{getTime(note)}</span>
         </p>
       </div>
     </Link>
