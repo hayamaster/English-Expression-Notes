@@ -1,8 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import Note
-from .serializers import NoteSerializer
+from .utils import updateNote, getNoteDetail, deleteNote, getNoteList, createNote
 
 # Create your views here.
 @api_view(['GET'])
@@ -46,36 +45,19 @@ def getRoutes(request):
 @api_view(['GET', 'POST'])
 def getNotes(request):
     if request.method == 'GET':
-        notes = Note.objects.all().order_by('-updated')
-        serializer = NoteSerializer(notes, many=True)
-        return Response(serializer.data)
+        return getNoteList()
 
     if request.method == 'POST':
-        data = request.data
-        note = Note.objects.create(
-            body=data['body']
-        )
-        serializer = NoteSerializer(note, many=False)
-        return Response(serializer.data)
+        return createNote(request)
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def getNote(request, pk):    
     if request.method == 'GET':
-        note = Note.objects.get(id=pk)
-        serializer = NoteSerializer(note, many=False)
-        return Response(serializer.data)
+        return getNoteDetail(pk)
     
     if request.method == 'PUT':
-        data = request.data
-        note = Note.objects.get(id=pk)
-        serializer = NoteSerializer(instance=note, data=data)
-        
-        if serializer.is_valid():
-            serializer.save()
-        return Response(serializer.data)
+        return updateNote(request, pk)
     
     if request.method == 'DELETE':
-        note = Note.objects.get(id=pk)
-        note.delete()
-        return Response('Note was deleted!')
+        return deleteNote(pk)
     
